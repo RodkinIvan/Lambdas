@@ -1,6 +1,7 @@
 #include <iostream>
+#include "core/objects/lambda_expression.h"
 
 int main() {
-    std::cout << "Hello, beta_reduction!" << std::endl;
+    auto l = lambda_term("lambda f x. f f x");
     return 0;
 }

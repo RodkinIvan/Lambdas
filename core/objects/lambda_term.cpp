@@ -42,6 +42,7 @@ size_t find_open_bracket(const std::string& s) {
     return end;
 }
 
+
 lambda_term::lambda_term(const std::string& s) {
     if (s.substr(0, 7) != "lambda ") {
         construct_from_string_expr(s);
@@ -55,8 +56,12 @@ lambda_term::lambda_term(const std::string& s) {
     construct_from_string_expr(
             s.substr(s.find('.') + 1, s.size())
     );
+
+    vars_places.resize(vars_names.size());
+    set_vars_places(this);
 }
 
+/// recursive
 void lambda_term::construct_from_string_expr(const std::string& expr) {
     size_t sz = expr.size();
     size_t begin = 0;
@@ -67,6 +72,7 @@ void lambda_term::construct_from_string_expr(const std::string& expr) {
     while (expr[end - 1] == ' ') {
         --end;
     }
+    expression = expr.substr(begin, end - begin);
     if (expr[end - 1] == ')') {
         size_t open = find_open_bracket(
                 expr.substr(begin, end - begin)
@@ -108,4 +114,19 @@ void lambda_term::construct_from_string_expr(const std::string& expr) {
             );
         }
     }
+}
+
+/// recursive
+void lambda_term::set_vars_places(lambda_term* term) {
+
+    size_t iter = 0;
+    for (const auto& name : vars_names) {
+        if (name == term->expression) {
+            vars_places[iter].push_back(term);
+        }
+        ++iter;
+    }
+    if (term->left) set_vars_places(term->left);
+    if (term->right) set_vars_places(term->right);
+
 }

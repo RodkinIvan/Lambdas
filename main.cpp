@@ -1,7 +1,15 @@
 #include <iostream>
-#include "core/objects/lambda_expression.h"
+#include "core/objects/lambda_term.h"
+
+void creating_test() {
+    auto three = lambda_term("lambda f x. f (f (f x))");
+    auto exp = lambda_term("lambda a b. b a");
+    std::cout << "////////////////////////////////////\n"
+                 "/////// Creating test passed ///////\n"
+                 "////////////////////////////////////\n";
+};
 
 int main() {
-    auto l = lambda_term("lambda f x. f f x");
+    creating_test();
     return 0;
 }

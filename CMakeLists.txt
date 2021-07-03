@@ -9,4 +9,5 @@ add_executable(Lambdas
         core/objects/lambda_expression.h
         core/objects/lambda_term.h
         core/objects/lambda_term.cpp
+        core/normalizer/normalizer.h
         )

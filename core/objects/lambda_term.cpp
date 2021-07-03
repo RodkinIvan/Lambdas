@@ -92,13 +92,13 @@ void lambda_term::construct_from_string_expr(const std::string& expr) {
     } else {
         size_t subterm_name_start = end - 1;
         while (
-                subterm_name_start != -1 &&
+                subterm_name_start != 0 &&
                 expr[subterm_name_start] != ' ' &&
                 expr[subterm_name_start] != ')'
                 ) {
             --subterm_name_start;
         }
-        ++subterm_name_start;
+        if (subterm_name_start) ++subterm_name_start;
         if (subterm_name_start != begin) {
             right = new lambda_term(
                     expr.substr(subterm_name_start, end - subterm_name_start)
@@ -203,4 +203,5 @@ lambda_term& lambda_term::operator=(lambda_term&& other) noexcept {
     other.left = nullptr;
     other.right = nullptr;
     other.parent = nullptr;
+    return *this;
 }

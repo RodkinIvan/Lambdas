@@ -19,7 +19,7 @@ std::vector<std::string> split(const std::string& s, char c = ' ') {
     return res;
 }
 
-size_t find_open_bracket(const std::string s) {
+size_t find_open_bracket(const std::string& s) {
     if (*(s.end() - 1) != ')') {
         std::cerr << "end char is not a bracket" << '\n';
         return 0;
@@ -41,26 +41,6 @@ size_t find_open_bracket(const std::string s) {
     }
     return end;
 }
-
-/*std::vector<size_t> find_all(const std::string& s, const std::string& substr) { /// make KMP ///
-    std::vector<size_t> res;
-    size_t sz = s.size();
-    size_t sub_sz = substr.size();
-    if (s[0] != ' ') {
-        std::cerr << "find_all should start with \' \' (space)";
-    }
-    for (size_t i = 0; i < sz - sub_sz + 1; ++i) {
-        if (s[i] == substr[0]
-            && (s[i - 1] == ' '
-                    && (i + sub_sz == sz
-                        || s[i + sub_sz] == ' '))
-            && s.substr(i, sub_sz) == substr) {
-            res.push_back(i);
-        }
-    }
-    return res;
-}*/
-
 
 lambda_term::lambda_term(const std::string& s) {
     if (s.substr(0, 7) != "lambda ") {
@@ -91,7 +71,7 @@ void lambda_term::construct_from_string_expr(const std::string& expr) {
         size_t open = find_open_bracket(
                 expr.substr(begin, end - begin)
         );
-        if(open == 0){
+        if (open == 0) {
             construct_from_string_expr(expr.substr(begin + 1, end - begin - 2));
             return;
         }

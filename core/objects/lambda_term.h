@@ -5,8 +5,8 @@
 
 struct lambda_term {
 
-    lambda_term* left;
-    lambda_term* right;
+    lambda_term* left = nullptr;
+    lambda_term* right = nullptr;
 
     std::vector<std::vector<lambda_term*>> vars_places;
     std::vector<std::string> vars_names;

@@ -78,18 +78,16 @@ void lambda_term::construct_from_string_expr(const std::string& expr) {
                 expr.substr(begin, end - begin)
         );
         if (open == 0) {
-            construct_from_string_expr(expr.substr(begin + 1, end - begin - 2));
+            construct_from_string_expr(
+                    expr.substr(begin + 1, end - begin - 2)
+            );
             return;
         }
         right = new lambda_term(
-                expr.substr(
-                        begin + open + 1, end - open - begin - 2
-                )
+                expr.substr(begin + open + 1, end - open - begin - 2)
         );
         left = new lambda_term(
-                expr.substr(
-                        begin, open
-                )
+                expr.substr(begin, open)
         );
     } else {
         size_t subterm_name_start = end - 1;
@@ -103,30 +101,106 @@ void lambda_term::construct_from_string_expr(const std::string& expr) {
         ++subterm_name_start;
         if (subterm_name_start != begin) {
             right = new lambda_term(
-                    expr.substr(
-                            subterm_name_start, end - subterm_name_start
-                    )
+                    expr.substr(subterm_name_start, end - subterm_name_start)
             );
             left = new lambda_term(
-                    expr.substr(
-                            0, subterm_name_start
-                    )
+                    expr.substr(begin, subterm_name_start)
             );
         }
     }
 }
 
 /// recursive
-void lambda_term::set_vars_places(lambda_term* term) {
+void lambda_term::set_vars_places(lambda_term* term, lambda_term* par) {
 
     size_t iter = 0;
+    term->parent = par;
     for (const auto& name : vars_names) {
         if (name == term->expression) {
             vars_places[iter].push_back(term);
         }
         ++iter;
     }
-    if (term->left) set_vars_places(term->left);
-    if (term->right) set_vars_places(term->right);
+    if (term->left) set_vars_places(term->left, term);
+    if (term->right) set_vars_places(term->right, term);
 
+}
+
+lambda_term::lambda_term(const lambda_term& other) :
+        expression(other.expression),
+        vars_places(other.vars_places),
+        vars_names(other.vars_names) {
+    if (other.left) {
+        left = new lambda_term(*other.left);
+        left->parent = this;
+    }
+    if (other.right) {
+        right = new lambda_term(*other.right);
+        right->parent = this;
+    }
+}
+
+lambda_term::~lambda_term() {
+    delete left;
+    delete right;
+}
+
+lambda_term& lambda_term::operator=(const lambda_term& other) {
+    delete left;
+    delete right;
+    expression = other.expression;
+    vars_places = other.vars_places;
+    vars_names = other.vars_names;
+    if (other.left) {
+        left = new lambda_term(*other.left);
+        left->parent = this;
+    }
+    if (other.right) {
+        right = new lambda_term(*other.right);
+        right->parent = this;
+    }
+    return *this;
+}
+
+lambda_term::lambda_term(lambda_term&& other) noexcept:
+        expression(std::move(other.expression)),
+        vars_places(std::move(other.vars_places)),
+        vars_names(std::move(other.vars_names)) {
+    left = other.left;
+    right = other.right;
+    parent = other.parent;
+
+    if (parent) {
+        if (other.parent->left == &other) {
+            other.parent->left = this;
+        } else {
+            other.parent->right = this;
+        }
+    }
+    other.left = nullptr;
+    other.right = nullptr;
+    other.parent = nullptr;
+
+}
+
+lambda_term& lambda_term::operator=(lambda_term&& other) noexcept {
+    delete left;
+    delete right;
+    expression = std::move(other.expression);
+    vars_places = std::move(other.vars_places);
+    vars_names = std::move(other.vars_names);
+    left = other.left;
+    right = other.right;
+    parent = other.parent;
+
+    if (parent) {
+        if (other.parent->left == &other) {
+            other.parent->left = this;
+        } else {
+            other.parent->right = this;
+        }
+    }
+    other.left = nullptr;
+    other.right = nullptr;
+    other.parent = nullptr;
 }

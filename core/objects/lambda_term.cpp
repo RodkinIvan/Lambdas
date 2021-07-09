@@ -1,8 +1,8 @@
 #include "lambda_term.h"
 #include <iostream>
 
-std::vector<std::string> split(const std::string& s, char c = ' ') {
-    std::vector<std::string> res;
+std::deque<std::string> split(const std::string& s, char c) {
+    std::deque<std::string> res;
     size_t sz = s.size();
     size_t prev_c = -1;
     for (size_t i = 0; i < sz; ++i) {
@@ -44,17 +44,23 @@ size_t find_open_bracket(const std::string& s) {
 
 
 lambda_term::lambda_term(const std::string& s) {
-    if (s.substr(0, 7) != "lambda ") {
-        construct_from_string_expr(s);
+    size_t begin = 0;
+    size_t end = s.size();
+    while (s[end - 1] == ')' && find_open_bracket(s.substr(begin, end - begin)) == 0) {
+        ++begin;
+        --end;
+    }
+    if (s.substr(begin, 7) != "lambda ") {
+        construct_from_string_expr(s.substr(begin, end - begin));
+        set_vars_places(this);
         return;
     }
-
     vars_names = split(
-            s.substr(7, s.find('.') - 7)
+            s.substr(begin + 7, s.find('.') - 7 - begin)
     );
 
     construct_from_string_expr(
-            s.substr(s.find('.') + 1, s.size())
+            s.substr(s.find('.') + 1, end - s.find('.') - 1)
     );
 
     vars_places.resize(vars_names.size());
@@ -98,7 +104,7 @@ void lambda_term::construct_from_string_expr(const std::string& expr) {
                 ) {
             --subterm_name_start;
         }
-        if (subterm_name_start) ++subterm_name_start;
+        if (subterm_name_start || expr[subterm_name_start] == ' ') ++subterm_name_start;
         if (subterm_name_start != begin) {
             right = new lambda_term(
                     expr.substr(subterm_name_start, end - subterm_name_start)

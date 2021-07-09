@@ -3,14 +3,15 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <deque>
 
 
 struct lambda_term {
 
     std::string expression;
 
-    std::vector<std::vector<lambda_term*>> vars_places;
-    std::vector<std::string> vars_names;
+    std::deque<std::vector<lambda_term*>> vars_places;
+    std::deque<std::string> vars_names;
 
     lambda_term* left = nullptr;
     lambda_term* right = nullptr;
@@ -22,7 +23,7 @@ struct lambda_term {
 
     lambda_term(const lambda_term& other);
 
-    lambda_term(lambda_term&& other) noexcept ;
+    lambda_term(lambda_term&& other) noexcept;
 
     lambda_term& operator=(lambda_term&& other) noexcept;
 
@@ -36,4 +37,7 @@ private:
     void set_vars_places(lambda_term* term, lambda_term* parent = nullptr);
 };
 
-// std::unordered_map<std::string, lambda_term> identifiers;
+
+std::deque<std::string> split(const std::string& s, char c = ' ');
+
+size_t find_open_bracket(const std::string& s);
